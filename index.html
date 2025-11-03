@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur de Rapport Volumétrique (RV)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: #f9fafb;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            outline: none;
+            -moz-appearance: textfield;
+        }
+
+        /* Suppression des flèches pour Chrome, Safari, Edge */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"]:focus {
+            border-color: #f97316;
+        }
+
+        .unit {
+            position: absolute;
+            right: 15px;
+            color: #999;
+            font-weight: 600;
+            pointer-events: none;
+        }
+
+        .info-text {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .btn-calculate {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(249, 115, 22, 0.4);
+        }
+
+        .btn-calculate:active {
+            transform: translateY(0);
+        }
+
+        .advanced-toggle {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: 2px solid #f97316;
+            color: #f97316;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .toggle-btn:hover {
+            background: #f97316;
+            color: white;
+        }
+
+        .advanced-options {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px dashed #f97316;
+        }
+
+        .advanced-options.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 500px;
+            }
+        }
+
+        .advanced-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #f97316;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        /* Modal/Pop-up styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 30px;
+            color: #999;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .results {
+            padding: 0;
+        }
+
+        .result-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            color: #333;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .result-main {
+            background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .result-main .result-value {
+            font-size: 36px;
+            color: #f97316;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .formula-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .formula-info strong {
+            color: #333;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .result-value {
+                font-size: 18px;
+            }
+
+            .result-main .result-value {
+                font-size: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏁 CalculRV 🏁</h1>
+        <p class="subtitle">Calculateur de Rapport Volumétrique et + </p>
+
+        <div class="input-group">
+            <label for="alesage">Alésage (diamètre du cylindre)</label>
+            <div class="input-wrapper">
+                <input type="number" id="alesage" step="0.1" placeholder="Ex: 85.5" min="0">
+                <span class="unit">mm</span>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="course">Course du piston</label>
+            <div class="input-wrapper">
+                <input type="number" id="course" step="0.1" placeholder="Ex: 69" min="0">
+                <span class="unit">mm</span>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="vcc">Volume de la chambre de combustion (culasse)</label>
+            <div class="input-wrapper">
+                <input type="number" id="vcc" step="0.1" placeholder="Ex: 50" min="0">
+                <span class="unit">cm³</span>
+            </div>
+            <p class="info-text">Volume de la chambre dans la culasse uniquement</p>
+        </div>
+
+        <div class="input-group">
+            <label for="deck-height">Deck Height (hauteur de dépassement)</label>
+            <div class="input-wrapper">
+                <input type="number" id="deck-height" step="0.01" placeholder="Ex: 0.5" value="0">
+                <span class="unit">mm</span>
+            </div>
+            <p class="info-text">Positif si le piston est en dessous du plan de joint, négatif s'il dépasse</p>
+        </div>
+
+        <div class="advanced-toggle">
+            <button type="button" class="toggle-btn" onclick="toggleAdvanced()">⚙️ Options avancées</button>
+        </div>
+
+        <div class="advanced-options" id="advanced-options">
+            <div class="advanced-title">Paramètres optionnels</div>
+            
+            <div class="input-group">
+                <label for="nb-cylindres">Nombre de cylindres</label>
+                <div class="input-wrapper">
+                    <input type="number" id="nb-cylindres" step="1" placeholder="Ex: 4" value="4" min="1">
+                    <span class="unit">cyl.</span>
+                </div>
+                <p class="info-text">Pour calculer la cylindrée totale du moteur</p>
+            </div>
+
+            <div class="input-group">
+                <label for="joint-culasse">Épaisseur du joint de culasse (comprimé)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="joint-culasse" step="0.01" placeholder="Ex: 1.2" value="0">
+                    <span class="unit">mm</span>
+                </div>
+                <p class="info-text">Épaisseur du joint une fois serré</p>
+            </div>
+
+            <div class="input-group">
+                <label for="volume-piston">Volume cavité/dôme du piston</label>
+                <div class="input-wrapper">
+                    <input type="number" id="volume-piston" step="0.1" placeholder="Ex: 0" value="0">
+                    <span class="unit">cm³</span>
+                </div>
+                <p class="info-text">Positif pour une cavité (dish), négatif pour un dôme</p>
+            </div>
+        </div>
+
+        <button class="btn-calculate" onclick="calculerRV()">Calculer le RV</button>
+
+        <div class="formula-info">
+            <strong>Formule :</strong> RV = (Vc + Vcc_total) / Vcc_total<br>
+            <strong>Où :</strong><br>
+            • Vc = (π × Alésage² × Course) / 4<br>
+            • Vcc_total = V_chambre + V_deck + V_joint + V_piston<br>
+            • V_deck = π × (Alésage/2)² × deck_height<br>
+            • V_joint = π × (Alésage/2)² × épaisseur_joint
+        </div>
+
+        <div class="footer">
+            🔧 Créé par FRDD pour les passionnés de mécanique 🔧
+			V1.01 11/2025
+        </div>
+    </div>
+
+    <!-- Modal Pop-up pour les résultats -->
+    <div class="modal" id="resultsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📊 Résultats du calcul</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+
+            <div class="results">
+                <div class="result-main">
+                    <div class="result-label">Rapport Volumétrique</div>
+                    <div class="result-value" id="rv-value">-</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Cylindrée unitaire (Vc)</div>
+                    <div class="result-value" id="vc-value">-</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Cylindrée totale moteur</div>
+                    <div class="result-value" id="cylindree-totale">-</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Volume chambre culasse</div>
+                    <div class="result-value" id="vcc-detail">-</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Volume deck height</div>
+                    <div class="result-value" id="vdeck-value">-</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Volume joint de culasse</div>
+                    <div class="result-value" id="vjoint-value">-</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Volume piston (cavité/dôme)</div>
+                    <div class="result-value" id="vpiston-value">-</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Volume total chambre combustion</div>
+                    <div class="result-value" id="vcc-total-value">-</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Volume total (PMB)</div>
+                    <div class="result-value" id="vtotal-value">-</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Type de moteur estimé</div>
+                    <div class="result-value" id="type-moteur" style="font-size: 18px;">-</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleAdvanced() {
+            const advancedOptions = document.getElementById('advanced-options');
+            advancedOptions.classList.toggle('show');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('resultsModal');
+            modal.classList.remove('show');
+        }
+
+        // Fermer la modal en cliquant en dehors
+        window.onclick = function(event) {
+            const modal = document.getElementById('resultsModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Fermer la modal avec la touche Échap
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        function calculerRV() {
+            // Récupération des valeurs
+            const alesage = parseFloat(document.getElementById('alesage').value);
+            const course = parseFloat(document.getElementById('course').value);
+            const vcc = parseFloat(document.getElementById('vcc').value);
+            const deckHeight = parseFloat(document.getElementById('deck-height').value) || 0;
+            const nbCylindres = parseInt(document.getElementById('nb-cylindres').value) || 4;
+            const jointCulasse = parseFloat(document.getElementById('joint-culasse').value) || 0;
+            const volumePiston = parseFloat(document.getElementById('volume-piston').value) || 0;
+
+            // Validation des entrées essentielles
+            if (isNaN(alesage) || isNaN(course) || isNaN(vcc) || alesage <= 0 || course <= 0 || vcc <= 0) {
+                alert('⚠️ Veuillez remplir au minimum l\'alésage, la course et le volume de la chambre culasse avec des valeurs positives.');
+                return;
+            }
+
+            // Calcul de la cylindrée unitaire en cm³
+            // Formule: Vc = (π × Alésage² × Course) / 4
+            // Alésage et course sont en mm, on convertit en cm
+            const alesageCm = alesage / 10;
+            const courseCm = course / 10;
+            const vc = (Math.PI * Math.pow(alesageCm, 2) * courseCm) / 4;
+
+            // Calcul de la cylindrée totale
+            const cylindreeTotale = vc * nbCylindres;
+
+            // Calcul du volume du deck height en cm³
+            // V_deck = π × (Alésage/2)² × deck_height
+            const deckHeightCm = deckHeight / 10; // conversion mm vers cm
+            const volumeDeck = Math.PI * Math.pow(alesageCm / 2, 2) * deckHeightCm;
+
+            // Calcul du volume du joint de culasse en cm³
+            const jointCulasseCm = jointCulasse / 10; // conversion mm vers cm
+            const volumeJoint = Math.PI * Math.pow(alesageCm / 2, 2) * jointCulasseCm;
+
+            // Volume total de la chambre de combustion
+            // Vcc_total = Volume chambre culasse + Volume deck + Volume joint + Volume piston
+            const vccTotal = vcc + volumeDeck + volumeJoint + volumePiston;
+
+            // Calcul du volume total (cylindrée + chambre combustion)
+            const volumeTotal = vc + vccTotal;
+
+            // Calcul du rapport volumétrique
+            const rv = volumeTotal / vccTotal;
+
+            // Détermination du type de moteur
+            let typeMoteur = '';
+            if (rv < 9) {
+                typeMoteur = '🔵 Moteur essence (faible compression)';
+            } else if (rv >= 9 && rv <= 13) {
+                typeMoteur = '🟢 Moteur essence moderne';
+            } else if (rv > 13 && rv < 16) {
+                typeMoteur = '🟡 Haute compression / Diesel léger';
+            } else {
+                typeMoteur = '🔴 Moteur diesel';
+            }
+
+            // Affichage des résultats dans la modal
+            document.getElementById('rv-value').textContent = rv.toFixed(2) + ':1';
+            document.getElementById('vc-value').textContent = vc.toFixed(2) + ' cm³';
+            
+            // Affichage de la cylindrée totale
+            if (cylindreeTotale >= 1000) {
+                document.getElementById('cylindree-totale').textContent = (cylindreeTotale / 1000).toFixed(2) + ' L (' + nbCylindres + ' cyl.)';
+            } else {
+                document.getElementById('cylindree-totale').textContent = cylindreeTotale.toFixed(0) + ' cm³ (' + nbCylindres + ' cyl.)';
+            }
+            
+            document.getElementById('vcc-detail').textContent = vcc.toFixed(2) + ' cm³';
+            document.getElementById('vdeck-value').textContent = volumeDeck.toFixed(2) + ' cm³';
+            document.getElementById('vjoint-value').textContent = volumeJoint.toFixed(2) + ' cm³';
+            document.getElementById('vpiston-value').textContent = volumePiston.toFixed(2) + ' cm³';
+            document.getElementById('vcc-total-value').textContent = vccTotal.toFixed(2) + ' cm³';
+            document.getElementById('vtotal-value').textContent = volumeTotal.toFixed(2) + ' cm³';
+            document.getElementById('type-moteur').textContent = typeMoteur;
+
+            // Ouverture de la modal
+            document.getElementById('resultsModal').classList.add('show');
+        }
+
+        // Permettre le calcul avec la touche Entrée
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    calculerRV();
+                }
+            });
+        });
+    </script>
+
+    <!-- GoatCounter Analytics -->
+    <script data-goatcounter="https://frdd.goatcounter.com/count"
+            async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
