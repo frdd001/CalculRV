@@ -380,9 +380,18 @@
         <div class="input-group">
             <label for="course">Course du piston</label>
             <div class="input-wrapper">
-                <input type="number" id="course" step="0.1" placeholder="Ex: 69" min="0">
+                <input type="number" id="course" step="0.1" placeholder="Choisir ou saisir" min="0" list="courses-predefines">
                 <span class="unit">mm</span>
             </div>
+            <datalist id="courses-predefines">
+                <option value="64">64 mm</option>
+                <option value="69">69 mm</option>
+                <option value="74">74 mm</option>
+                <option value="76">76 mm</option>
+                <option value="78">78 mm</option>
+                <option value="82">82 mm</option>
+                <option value="84">84 mm</option>
+            </datalist>
         </div>
 
         <div class="input-group">
@@ -422,9 +431,15 @@
             <div class="input-group">
                 <label for="longueur-bielle">Longueur de bielle (entre-axe)</label>
                 <div class="input-wrapper">
-                    <input type="number" id="longueur-bielle" step="0.1" placeholder="Ex: 150" value="0">
+                    <input type="number" id="longueur-bielle" step="0.01" placeholder="Choisir ou saisir" list="bielles-predefines">
                     <span class="unit">mm</span>
                 </div>
+                <datalist id="bielles-predefines">
+                    <option value="135.25">135.25 mm (5.325")</option>
+                    <option value="137.00">137.00 mm (5.394")</option>
+                    <option value="137.16">137.16 mm (5.400")</option>
+                    <option value="139.70">139.70 mm (5.500")</option>
+                </datalist>
                 <p class="info-text">Distance entre-axe coussinet/axe de piston (pour calcul du Rod Ratio)</p>
             </div>
 
@@ -573,7 +588,8 @@
             const vcc = parseFloat(document.getElementById('vcc').value);
             const deckHeight = parseFloat(document.getElementById('deck-height').value) || 0;
             const nbCylindres = parseInt(document.getElementById('nb-cylindres').value) || 4;
-            const longueurBielle = parseFloat(document.getElementById('longueur-bielle').value) || 0;
+            const longueurBielleInput = document.getElementById('longueur-bielle').value;
+            const longueurBielle = longueurBielleInput ? parseFloat(longueurBielleInput) : 0;
             const jointCulasse = parseFloat(document.getElementById('joint-culasse').value) || 0;
             const volumePiston = parseFloat(document.getElementById('volume-piston').value) || 0;
 
