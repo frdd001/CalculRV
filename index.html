@@ -420,6 +420,15 @@
             </div>
 
             <div class="input-group">
+                <label for="longueur-bielle">Longueur de bielle (entre-axe)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="longueur-bielle" step="0.1" placeholder="Ex: 150" value="0">
+                    <span class="unit">mm</span>
+                </div>
+                <p class="info-text">Distance entre-axe coussinet/axe de piston (pour calcul du Rod Ratio)</p>
+            </div>
+
+            <div class="input-group">
                 <label for="joint-culasse">Épaisseur du joint de culasse (comprimé)</label>
                 <div class="input-wrapper">
                     <input type="number" id="joint-culasse" step="0.01" placeholder="Ex: 1.2" value="0">
@@ -451,7 +460,7 @@
 
         <div class="footer">
             🔧 Créé par FRDD pour les passionnés de mécanique 🔧
-			V1.01 11/2025
+			V1.02 11/2025
             <br>
             <a href="https://github.com/frdd001/CalculRV/issues/new" target="_blank" class="bug-report-link">
                 🐛 Signaler un bug ou suggérer une amélioration
@@ -481,6 +490,11 @@
                 <div class="result-item">
                     <div class="result-label">Cylindrée totale moteur</div>
                     <div class="result-value" id="cylindree-totale">-</div>
+                </div>
+
+                <div class="result-item" id="rod-ratio-section" style="display: none;">
+                    <div class="result-label">Rod Ratio (Bielle/Course)</div>
+                    <div class="result-value" id="rod-ratio-value">-</div>
                 </div>
 
                 <div class="result-item">
@@ -554,6 +568,7 @@
             const vcc = parseFloat(document.getElementById('vcc').value);
             const deckHeight = parseFloat(document.getElementById('deck-height').value) || 0;
             const nbCylindres = parseInt(document.getElementById('nb-cylindres').value) || 4;
+            const longueurBielle = parseFloat(document.getElementById('longueur-bielle').value) || 0;
             const jointCulasse = parseFloat(document.getElementById('joint-culasse').value) || 0;
             const volumePiston = parseFloat(document.getElementById('volume-piston').value) || 0;
 
@@ -613,6 +628,31 @@
                 document.getElementById('cylindree-totale').textContent = (cylindreeTotale / 1000).toFixed(2) + ' L (' + nbCylindres + ' cyl.)';
             } else {
                 document.getElementById('cylindree-totale').textContent = cylindreeTotale.toFixed(0) + ' cm³ (' + nbCylindres + ' cyl.)';
+            }
+            
+            // Calcul et affichage du Rod Ratio
+            const rodRatioSection = document.getElementById('rod-ratio-section');
+            if (longueurBielle > 0 && course > 0) {
+                const rodRatio = longueurBielle / course;
+                let rodRatioQuality = '';
+                
+                // Détermination de la qualité du rod ratio
+                if (rodRatio < 1.5) {
+                    rodRatioQuality = '⚠️ Très faible (>usure)';
+                } else if (rodRatio >= 1.5 && rodRatio < 1.7) {
+                    rodRatioQuality = '🟡 Faible (sport/couple)';
+                } else if (rodRatio >= 1.7 && rodRatio < 1.9) {
+                    rodRatioQuality = '🟢 Optimal (routier)';
+                } else if (rodRatio >= 1.9 && rodRatio < 2.2) {
+                    rodRatioQuality = '🔵 Excellent (sport/course)';
+                } else {
+                    rodRatioQuality = '⭐ Très élevé (F1/course)';
+                }
+                
+                document.getElementById('rod-ratio-value').textContent = rodRatio.toFixed(2) + ':1 - ' + rodRatioQuality;
+                rodRatioSection.style.display = 'block';
+            } else {
+                rodRatioSection.style.display = 'none';
             }
             
             document.getElementById('vcc-detail').textContent = vcc.toFixed(2) + ' cm³';
