@@ -1,0 +1,13 @@
+ Changelog
+Version 1.02 - Novembre 2025
+
+✅ Ajout du champ "Longueur de bielle" dans les options avancées
+✅ Calcul et affichage du Rod Ratio
+✅ Évaluation qualitative du Rod Ratio (5 catégories)
+✅ Affichage conditionnel (uniquement si bielle renseignée)
+
+Version 1.01 - Novembre 2025
+
+Système de bug report intégré
+Design gris/orange
+Toutes les fonctionnalités de base
