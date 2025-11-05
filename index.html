@@ -460,7 +460,7 @@
 
         <div class="footer">
             🔧 Créé par FRDD pour les passionnés de mécanique 🔧
-			V1.02 11/2025
+			V1.03 11/2025
             <br>
             <a href="https://github.com/frdd001/CalculRV/issues/new" target="_blank" class="bug-report-link">
                 🐛 Signaler un bug ou suggérer une amélioration
@@ -495,6 +495,11 @@
                 <div class="result-item" id="rod-ratio-section" style="display: none;">
                     <div class="result-label">Rod Ratio (Bielle/Course)</div>
                     <div class="result-value" id="rod-ratio-value">-</div>
+                </div>
+
+                <div class="result-item" id="angle-bielle-section" style="display: none;">
+                    <div class="result-label">Angle maximum de la bielle</div>
+                    <div class="result-value" id="angle-bielle-value">-</div>
                 </div>
 
                 <div class="result-item">
@@ -632,6 +637,8 @@
             
             // Calcul et affichage du Rod Ratio
             const rodRatioSection = document.getElementById('rod-ratio-section');
+            const angleBielleSection = document.getElementById('angle-bielle-section');
+            
             if (longueurBielle > 0 && course > 0) {
                 const rodRatio = longueurBielle / course;
                 let rodRatioQuality = '';
@@ -651,8 +658,30 @@
                 
                 document.getElementById('rod-ratio-value').textContent = rodRatio.toFixed(2) + ':1 - ' + rodRatioQuality;
                 rodRatioSection.style.display = 'block';
+                
+                // Calcul de l'angle maximum de la bielle
+                // Formule: Angle_max = arcsin(Course / (2 × Longueur_bielle))
+                const angleRadians = Math.asin(course / (2 * longueurBielle));
+                const angleDegres = angleRadians * (180 / Math.PI);
+                
+                let angleQuality = '';
+                if (angleDegres < 10) {
+                    angleQuality = '⭐ Excellent (très faible friction)';
+                } else if (angleDegres >= 10 && angleDegres < 12) {
+                    angleQuality = '🟢 Optimal (faible friction)';
+                } else if (angleDegres >= 12 && angleDegres < 15) {
+                    angleQuality = '🟡 Moyen (friction modérée)';
+                } else if (angleDegres >= 15 && angleDegres < 18) {
+                    angleQuality = '🟠 Élevé (plus de friction)';
+                } else {
+                    angleQuality = '⚠️ Très élevé (friction importante)';
+                }
+                
+                document.getElementById('angle-bielle-value').textContent = angleDegres.toFixed(1) + '° - ' + angleQuality;
+                angleBielleSection.style.display = 'block';
             } else {
                 rodRatioSection.style.display = 'none';
+                angleBielleSection.style.display = 'none';
             }
             
             document.getElementById('vcc-detail').textContent = vcc.toFixed(2) + ' cm³';
